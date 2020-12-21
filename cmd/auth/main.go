@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"github.com/AleksK1NG/auth-microservice/config"
 	authServerGRPC "github.com/AleksK1NG/auth-microservice/internal/auth/delivery/grpc/server"
 	"github.com/AleksK1NG/auth-microservice/pkg/logger"
@@ -91,7 +92,12 @@ func main() {
 		MaxConnectionIdle: 5 * time.Minute,
 		Timeout:           15 * time.Second,
 		MaxConnectionAge:  5 * time.Minute,
-	}))
+	}),
+		grpc.UnaryInterceptor(func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
+			appLogger.Infof("INFO: %#v", info)
+			return handler(ctx, req)
+		}),
+	)
 
 	if cfg.Server.Mode != "Production" {
 		reflection.Register(server)
