@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"github.com/AleksK1NG/auth-microservice/config"
-	authServerGRPC "github.com/AleksK1NG/auth-microservice/internal/auth/delivery/grpc/server"
+	authServerGRPC "github.com/AleksK1NG/auth-microservice/internal/user/delivery/grpc/server"
 	"github.com/AleksK1NG/auth-microservice/pkg/logger"
 	"github.com/AleksK1NG/auth-microservice/pkg/postgres"
 	"github.com/AleksK1NG/auth-microservice/pkg/redis"
@@ -25,10 +25,9 @@ import (
 )
 
 func main() {
-	log.Println("Starting auth microservice")
+	log.Println("Starting user microservice")
 
 	configPath := utils.GetConfigPath(os.Getenv("config"))
-
 	cfgFile, err := config.LoadConfig(configPath)
 	if err != nil {
 		log.Fatalf("LoadConfig: %v", err)
@@ -40,10 +39,8 @@ func main() {
 	}
 
 	appLogger := logger.NewApiLogger(cfg)
-
 	appLogger.InitLogger()
 	appLogger.Infof("AppVersion: %s, LogLevel: %s, Mode: %s, SSL: %v", cfg.Server.AppVersion, cfg.Logger.Level, cfg.Server.Mode, cfg.Server.SSL)
-
 	appLogger.Infof("Success parsed config: %#v", cfg.Server.AppVersion)
 
 	psqlDB, err := postgres.NewPsqlDB(cfg)
