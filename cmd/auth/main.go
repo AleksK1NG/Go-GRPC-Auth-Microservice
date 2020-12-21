@@ -1,27 +1,19 @@
 package main
 
 import (
-	"context"
 	"github.com/AleksK1NG/auth-microservice/config"
-	authServerGRPC "github.com/AleksK1NG/auth-microservice/internal/user/delivery/grpc/server"
+	"github.com/AleksK1NG/auth-microservice/internal/server"
 	"github.com/AleksK1NG/auth-microservice/pkg/logger"
 	"github.com/AleksK1NG/auth-microservice/pkg/postgres"
 	"github.com/AleksK1NG/auth-microservice/pkg/redis"
 	"github.com/AleksK1NG/auth-microservice/pkg/utils"
-	userService "github.com/AleksK1NG/auth-microservice/proto"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/keepalive"
-	"google.golang.org/grpc/reflection"
-	"log"
-	"net"
-	"os"
-	"time"
-
 	"github.com/opentracing/opentracing-go"
 	"github.com/uber/jaeger-client-go"
 	jaegercfg "github.com/uber/jaeger-client-go/config"
 	jaegerlog "github.com/uber/jaeger-client-go/log"
 	"github.com/uber/jaeger-lib/metrics"
+	"log"
+	"os"
 )
 
 func main() {
@@ -80,30 +72,30 @@ func main() {
 	defer closer.Close()
 	appLogger.Info("Opentracing connected")
 
-	l, err := net.Listen("tcp", cfg.Server.Port)
-	if err != nil {
-		appLogger.Fatal(err)
-	}
+	authServer := server.NewAuthServer(appLogger, cfg)
+	appLogger.Fatal(authServer.Run())
 
-	server := grpc.NewServer(grpc.KeepaliveParams(keepalive.ServerParameters{
-		MaxConnectionIdle: 5 * time.Minute,
-		Timeout:           15 * time.Second,
-		MaxConnectionAge:  5 * time.Minute,
-	}),
-		grpc.UnaryInterceptor(func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
-			appLogger.Infof("INFO: %#v", info)
-			return handler(ctx, req)
-		}),
-	)
+	//l, err := net.Listen("tcp", cfg.Server.Port)
+	//if err != nil {
+	//	appLogger.Fatal(err)
+	//}
 
-	if cfg.Server.Mode != "Production" {
-		reflection.Register(server)
-	}
-
-	authGRPCServer := authServerGRPC.NewAuthServerGRPC(appLogger, cfg)
-
-	userService.RegisterUserServiceServer(server, authGRPCServer)
-
-	appLogger.Infof("Server is listening on port: %v", cfg.Server.Port)
-	appLogger.Fatal(server.Serve(l))
+	//server := grpc.NewServer(grpc.KeepaliveParams(keepalive.ServerParameters{
+	//	MaxConnectionIdle: 5 * time.Minute,
+	//	Timeout:           15 * time.Second,
+	//	MaxConnectionAge:  5 * time.Minute,
+	//}),
+	//	grpc.UnaryInterceptor(),
+	//)
+	//
+	//if cfg.Server.Mode != "Production" {
+	//	reflection.Register(server)
+	//}
+	//
+	//authGRPCServer := authServerGRPC.NewAuthServerGRPC(appLogger, cfg)
+	//
+	//userService.RegisterUserServiceServer(server, authGRPCServer)
+	//
+	//appLogger.Infof("Server is listening on port: %v", cfg.Server.Port)
+	//appLogger.Fatal(server.Serve(l))
 }
