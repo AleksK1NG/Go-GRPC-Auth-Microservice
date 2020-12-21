@@ -1,0 +1,30 @@
+// protoc --go_out=plugins=grpc:. *.proto
+
+syntax = "proto3";
+
+package userService;
+option go_package = ".;userService";
+
+message Session {
+  string session = 1;
+}
+
+message User {
+  string email = 1;
+  string firstName = 2;
+  string lastName = 3;
+  string password = 5;
+  uint64 uid = 6;
+}
+
+message RegisterRequest {
+  string email = 1;
+  string firstName = 2;
+  string lastName = 3;
+  string password = 5;
+}
+
+
+service UserService{
+  rpc Register(RegisterRequest) returns (User);
+}
