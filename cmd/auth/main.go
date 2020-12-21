@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/AleksK1NG/auth-microservice/config"
+	"github.com/AleksK1NG/auth-microservice/pkg/logger"
 	"github.com/AleksK1NG/auth-microservice/pkg/utils"
 	"log"
 	"os"
@@ -22,5 +23,10 @@ func main() {
 		log.Fatalf("ParseConfig: %v", err)
 	}
 
-	log.Printf("Success parsed config: %#v", cfg.Server.AppVersion)
+	appLogger := logger.NewApiLogger(cfg)
+
+	appLogger.InitLogger()
+	appLogger.Infof("AppVersion: %s, LogLevel: %s, Mode: %s, SSL: %v", cfg.Server.AppVersion, cfg.Logger.Level, cfg.Server.Mode, cfg.Server.SSL)
+
+	appLogger.Infof("Success parsed config: %#v", cfg.Server.AppVersion)
 }
