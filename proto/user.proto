@@ -24,7 +24,14 @@ message RegisterRequest {
   string password = 5;
 }
 
+message RegisterResponse {
+  string email = 1;
+  string firstName = 2;
+  string lastName = 3;
+  uint64 uid = 4;
+}
+
 
 service UserService{
-  rpc Register(RegisterRequest) returns (User);
+  rpc Register(RegisterRequest) returns (RegisterResponse);
 }
