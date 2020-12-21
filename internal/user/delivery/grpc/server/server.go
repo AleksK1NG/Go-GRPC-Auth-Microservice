@@ -30,23 +30,20 @@ func (u *usersServer) Register(ctx context.Context, r *userService.RegisterReque
 
 	u.logger.Infof("Get request %s\n", r.String())
 
-	user, err := u.userUC.Register(ctx, &models.User{
+	createdUser, err := u.userUC.Register(ctx, &models.User{
 		Email:     r.GetEmail(),
 		FirstName: r.GetFirstName(),
 		LastName:  r.GetLastName(),
 		Password:  r.GetPassword(),
 	})
-	if user == nil {
-		return nil, status.Error(codes.Internal, "cannot create a new user")
-	}
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "userUC.Register% %#v", err)
+		return nil, status.Errorf(codes.Internal, "userUC.Register: %#v", err)
 	}
 
 	return &userService.RegisterResponse{
-		Email:     user.Email,
-		FirstName: user.FirstName,
-		LastName:  user.LastName,
-		UserID:    user.UserID,
+		Email:     createdUser.Email,
+		FirstName: createdUser.FirstName,
+		LastName:  createdUser.LastName,
+		UserID:    createdUser.UserID,
 	}, nil
 }
