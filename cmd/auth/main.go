@@ -82,7 +82,7 @@ func main() {
 	defer closer.Close()
 	appLogger.Info("Opentracing connected")
 
-	l, err := net.Listen("tcp", ":8081")
+	l, err := net.Listen("tcp", cfg.Server.Port)
 	if err != nil {
 		appLogger.Fatal(err)
 	}
@@ -92,6 +92,7 @@ func main() {
 		Timeout:           15 * time.Second,
 		MaxConnectionAge:  5 * time.Minute,
 	}))
+
 	if cfg.Server.Mode != "Production" {
 		reflection.Register(server)
 	}
@@ -100,6 +101,6 @@ func main() {
 
 	userService.RegisterUserServiceServer(server, authGRPCServer)
 
-	appLogger.Infof("Server is listening on port: %v", ":8081")
+	appLogger.Infof("Server is listening on port: %v", cfg.Server.Port)
 	appLogger.Fatal(server.Serve(l))
 }
