@@ -25,7 +25,7 @@ func (im *InterceptorManager) Logger(ctx context.Context, req interface{}, info 
 	start := time.Now()
 	md, _ := metadata.FromIncomingContext(ctx)
 	reply, err := handler(ctx, req)
-	im.logger.Infof("METHOD: %s, reply: %#v, time: %v, metadata: %v, err: %#v", info.FullMethod, reply, time.Since(start), md, err)
+	im.logger.Infof("Method: %s, Reply: %#v, Time: %v, Metadata: %v, Err: %#v", info.FullMethod, reply, time.Since(start), md, err)
 
 	return reply, err
 }

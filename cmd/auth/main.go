@@ -72,7 +72,7 @@ func main() {
 	defer closer.Close()
 	appLogger.Info("Opentracing connected")
 
-	authServer := server.NewAuthServer(appLogger, cfg)
+	authServer := server.NewAuthServer(appLogger, cfg, psqlDB, redisClient)
 	appLogger.Fatal(authServer.Run())
 
 	//l, err := net.Listen("tcp", cfg.Server.Port)

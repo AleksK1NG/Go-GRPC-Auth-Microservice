@@ -6,6 +6,6 @@ import (
 )
 
 // User pg repository
-type UserPGRepository interface {
+type UserRepository interface {
 	Register(ctx context.Context, user *models.User) (*models.User, error)
 }

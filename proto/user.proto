@@ -14,7 +14,7 @@ message User {
   string firstName = 2;
   string lastName = 3;
   string password = 5;
-  uint64 uid = 6;
+  int64 userID = 6;
 }
 
 message RegisterRequest {
@@ -28,7 +28,7 @@ message RegisterResponse {
   string email = 1;
   string firstName = 2;
   string lastName = 3;
-  uint64 uid = 4;
+  int64 userID = 4;
 }
 
 
