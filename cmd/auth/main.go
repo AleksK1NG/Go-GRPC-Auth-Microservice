@@ -74,28 +74,4 @@ func main() {
 
 	authServer := server.NewAuthServer(appLogger, cfg, psqlDB, redisClient)
 	appLogger.Fatal(authServer.Run())
-
-	//l, err := net.Listen("tcp", cfg.Server.Port)
-	//if err != nil {
-	//	appLogger.Fatal(err)
-	//}
-
-	//server := grpc.NewServer(grpc.KeepaliveParams(keepalive.ServerParameters{
-	//	MaxConnectionIdle: 5 * time.Minute,
-	//	Timeout:           15 * time.Second,
-	//	MaxConnectionAge:  5 * time.Minute,
-	//}),
-	//	grpc.UnaryInterceptor(),
-	//)
-	//
-	//if cfg.Server.Mode != "Production" {
-	//	reflection.Register(server)
-	//}
-	//
-	//authGRPCServer := authServerGRPC.NewAuthServerGRPC(appLogger, cfg)
-	//
-	//userService.RegisterUserServiceServer(server, authGRPCServer)
-	//
-	//appLogger.Infof("Server is listening on port: %v", cfg.Server.Port)
-	//appLogger.Fatal(server.Serve(l))
 }

@@ -30,6 +30,7 @@ func NewAuthServer(logger logger.Logger, cfg *config.Config, db *sqlx.DB, redisC
 	return &Server{logger: logger, cfg: cfg, db: db, redisClient: redisClient}
 }
 
+// Run server
 func (s *Server) Run() error {
 	im := interceptors.NewInterceptorManager(s.logger, s.cfg)
 	userRepo := repository.NewUserRepository(s.db)
