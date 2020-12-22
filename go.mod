@@ -6,6 +6,7 @@ require (
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-redis/redis/v8 v8.4.4
 	github.com/golang/protobuf v1.4.3
+	github.com/grpc-ecosystem/go-grpc-middleware v1.2.2
 	github.com/jackc/pgx v3.6.2+incompatible
 	github.com/jaegertracing/jaeger-lib v2.4.0+incompatible // indirect
 	github.com/jmoiron/sqlx v1.2.0
