@@ -400,8 +400,8 @@ var file_user_proto_depIdxs = []int32{
 	4, // 0: userService.User.created_at:type_name -> google.protobuf.Timestamp
 	4, // 1: userService.User.updated_at:type_name -> google.protobuf.Timestamp
 	1, // 2: userService.RegisterResponse.user:type_name -> userService.User
-	2, // 3: userService.UserService.Register:input_type -> userService.RegisterRequest
-	3, // 4: userService.UserService.Register:output_type -> userService.RegisterResponse
+	2, // 3: userService.UserService.Create:input_type -> userService.RegisterRequest
+	3, // 4: userService.UserService.Create:output_type -> userService.RegisterResponse
 	4, // [4:5] is the sub-list for method output_type
 	3, // [3:4] is the sub-list for method input_type
 	3, // [3:3] is the sub-list for extension type_name
@@ -509,7 +509,7 @@ func NewUserServiceClient(cc grpc.ClientConnInterface) UserServiceClient {
 
 func (c *userServiceClient) Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error) {
 	out := new(RegisterResponse)
-	err := c.cc.Invoke(ctx, "/userService.UserService/Register", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/userService.UserService/Create", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -526,7 +526,7 @@ type UnimplementedUserServiceServer struct {
 }
 
 func (*UnimplementedUserServiceServer) Register(context.Context, *RegisterRequest) (*RegisterResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
+	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
 }
 
 func RegisterUserServiceServer(s *grpc.Server, srv UserServiceServer) {
@@ -543,7 +543,7 @@ func _UserService_Register_Handler(srv interface{}, ctx context.Context, dec fun
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/userService.UserService/Register",
+		FullMethod: "/userService.UserService/Create",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).Register(ctx, req.(*RegisterRequest))
@@ -556,7 +556,7 @@ var _UserService_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*UserServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Register",
+			MethodName: "Create",
 			Handler:    _UserService_Register_Handler,
 		},
 	},

@@ -13,7 +13,7 @@ import (
 
 // Register new user
 func (u *usersServer) Register(ctx context.Context, r *userService.RegisterRequest) (*userService.RegisterResponse, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "user.Register")
+	span, ctx := opentracing.StartSpanFromContext(ctx, "user.Create")
 	defer span.Finish()
 
 	user, err := u.registerReqToUserModel(r)
@@ -29,7 +29,7 @@ func (u *usersServer) Register(ctx context.Context, r *userService.RegisterReque
 
 	createdUser, err := u.userUC.Register(ctx, user)
 	if err != nil {
-		u.logger.Errorf("userUC.Register: %v", err)
+		u.logger.Errorf("userUC.Create: %v", err)
 		return nil, err
 	}
 
