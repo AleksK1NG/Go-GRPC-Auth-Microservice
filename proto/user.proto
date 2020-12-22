@@ -59,6 +59,13 @@ message LoginRequest {
 
 message LoginResponse {
   User user = 1;
+  string session_id = 2;
+}
+
+message GetMeRequest{}
+
+message GetMeResponse {
+  User user = 1;
 }
 
 service UserService{
@@ -66,4 +73,5 @@ service UserService{
   rpc FindByEmail(FindByEmailRequest) returns (FindByEmailResponse);
   rpc FindByID(FindByIDRequest) returns (FindByIDResponse);
   rpc Login(LoginRequest) returns (LoginResponse);
+  rpc GetMe(GetMeRequest) returns(GetMeResponse);
 }

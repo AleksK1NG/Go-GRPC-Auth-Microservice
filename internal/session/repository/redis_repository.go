@@ -45,7 +45,7 @@ func (s *sessionRepo) CreateSession(ctx context.Context, sess *models.Session, e
 	if err = s.redisClient.Set(ctx, sessionKey, sessBytes, time.Second*time.Duration(expire)).Err(); err != nil {
 		return "", errors.Wrap(err, "sessionRepo.CreateSession.redisClient.Set")
 	}
-	return sessionKey, nil
+	return sess.SessionID, nil
 }
 
 // Get session by id
@@ -53,7 +53,7 @@ func (s *sessionRepo) GetSessionByID(ctx context.Context, sessionID string) (*mo
 	span, ctx := opentracing.StartSpanFromContext(ctx, "sessionRepo.GetSessionByID")
 	defer span.Finish()
 
-	sessBytes, err := s.redisClient.Get(ctx, sessionID).Bytes()
+	sessBytes, err := s.redisClient.Get(ctx, s.createKey(sessionID)).Bytes()
 	if err != nil {
 		return nil, errors.Wrap(err, "sessionRep.GetSessionByID.redisClient.Get")
 	}
@@ -70,7 +70,7 @@ func (s *sessionRepo) DeleteByID(ctx context.Context, sessionID string) error {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "sessionRepo.DeleteByID")
 	defer span.Finish()
 
-	if err := s.redisClient.Del(ctx, sessionID).Err(); err != nil {
+	if err := s.redisClient.Del(ctx, s.createKey(sessionID)).Err(); err != nil {
 		return errors.Wrap(err, "sessionRepo.DeleteByID")
 	}
 	return nil

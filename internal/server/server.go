@@ -3,9 +3,11 @@ package server
 import (
 	"github.com/AleksK1NG/auth-microservice/config"
 	"github.com/AleksK1NG/auth-microservice/internal/interceptors"
+	sessRepository "github.com/AleksK1NG/auth-microservice/internal/session/repository"
+	sessUseCase "github.com/AleksK1NG/auth-microservice/internal/session/usecase"
 	authServerGRPC "github.com/AleksK1NG/auth-microservice/internal/user/delivery/grpc/server"
-	"github.com/AleksK1NG/auth-microservice/internal/user/repository"
-	"github.com/AleksK1NG/auth-microservice/internal/user/usecase"
+	userRepository "github.com/AleksK1NG/auth-microservice/internal/user/repository"
+	userUseCase "github.com/AleksK1NG/auth-microservice/internal/user/usecase"
 	"github.com/AleksK1NG/auth-microservice/pkg/logger"
 	userService "github.com/AleksK1NG/auth-microservice/proto"
 	"github.com/go-redis/redis/v8"
@@ -34,8 +36,10 @@ func NewAuthServer(logger logger.Logger, cfg *config.Config, db *sqlx.DB, redisC
 // Run server
 func (s *Server) Run() error {
 	im := interceptors.NewInterceptorManager(s.logger, s.cfg)
-	userRepo := repository.NewUserRepository(s.db)
-	userUC := usecase.NewUserUseCase(s.logger, userRepo)
+	userRepo := userRepository.NewUserRepository(s.db)
+	sessRepo := sessRepository.NewSessionRepository(s.redisClient, s.cfg)
+	userUC := userUseCase.NewUserUseCase(s.logger, userRepo)
+	sessUC := sessUseCase.NewSessionUseCase(sessRepo, s.cfg)
 
 	l, err := net.Listen("tcp", s.cfg.Server.Port)
 	if err != nil {
@@ -55,7 +59,7 @@ func (s *Server) Run() error {
 		reflection.Register(server)
 	}
 
-	authGRPCServer := authServerGRPC.NewAuthServerGRPC(s.logger, s.cfg, userUC)
+	authGRPCServer := authServerGRPC.NewAuthServerGRPC(s.logger, s.cfg, userUC, sessUC)
 	userService.RegisterUserServiceServer(server, authGRPCServer)
 
 	s.logger.Infof("Server is listening on port: %v", s.cfg.Server.Port)
