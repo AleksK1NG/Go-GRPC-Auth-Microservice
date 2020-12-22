@@ -8,7 +8,6 @@ import (
 	userService "github.com/AleksK1NG/auth-microservice/proto"
 	"github.com/google/uuid"
 	"github.com/opentracing/opentracing-go"
-	"github.com/pkg/errors"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
@@ -67,7 +66,7 @@ func (u *usersServer) Login(ctx context.Context, r *userService.LoginRequest) (*
 
 	session, err := u.sessUC.CreateSession(ctx, &models.Session{
 		UserID: user.UserID,
-	}, 3600)
+	}, u.cfg.Session.Expire)
 	if err != nil {
 		u.logger.Errorf("sessUC.CreateSession: %v", err)
 		return nil, status.Errorf(grpc_errors.ParseGRPCErrStatusCode(err), "sessUC.CreateSession: %v", err)
@@ -121,19 +120,13 @@ func (u *usersServer) GetMe(ctx context.Context, r *userService.GetMeRequest) (*
 	span, ctx := opentracing.StartSpanFromContext(ctx, "user.Create")
 	defer span.Finish()
 
-	md, ok := metadata.FromIncomingContext(ctx)
-	if !ok {
-		u.logger.Errorf("GetMe: %v", errors.New("No ctx metadata"))
-		return nil, status.Error(codes.Unauthenticated, "No ctx metadata")
+	sessID, err := u.getSessionIDFromCtx(ctx)
+	if err != nil {
+		u.logger.Errorf("getSessionIDFromCtx: %v", err)
+		return nil, err
 	}
 
-	sessionID := md.Get("session_id")
-	if sessionID[0] == "" {
-		u.logger.Errorf("GetMe: %v", errors.New("No sessionID"))
-		return nil, status.Error(codes.Unauthenticated, "No ctx metadata")
-	}
-
-	session, err := u.sessUC.GetSessionByID(ctx, sessionID[0])
+	session, err := u.sessUC.GetSessionByID(ctx, sessID)
 	if err != nil {
 		u.logger.Errorf("sessUC.GetSessionByID: %v", err)
 		return nil, status.Errorf(grpc_errors.ParseGRPCErrStatusCode(err), "sessUC.GetSessionByID: %v", err)
@@ -141,11 +134,30 @@ func (u *usersServer) GetMe(ctx context.Context, r *userService.GetMeRequest) (*
 
 	user, err := u.userUC.FindById(ctx, session.UserID)
 	if err != nil {
-		u.logger.Errorf("sessUC.GetSessionByID: %v", err)
-		return nil, status.Errorf(grpc_errors.ParseGRPCErrStatusCode(err), "sessUC.GetSessionByID: %v", err)
+		u.logger.Errorf("userUC.FindById: %v", err)
+		return nil, status.Errorf(grpc_errors.ParseGRPCErrStatusCode(err), "userUC.FindById: %v", err)
 	}
 
 	return &userService.GetMeResponse{User: u.userModelToProto(user)}, nil
+}
+
+// Logout user, delete current session
+func (u *usersServer) Logout(ctx context.Context, request *userService.LogoutRequest) (*userService.LogoutResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "user.Create")
+	defer span.Finish()
+
+	sessID, err := u.getSessionIDFromCtx(ctx)
+	if err != nil {
+		u.logger.Errorf("getSessionIDFromCtx: %v", err)
+		return nil, err
+	}
+
+	if err := u.sessUC.DeleteByID(ctx, sessID); err != nil {
+		u.logger.Errorf("sessUC.DeleteByID: %v", err)
+		return nil, status.Errorf(grpc_errors.ParseGRPCErrStatusCode(err), "sessUC.DeleteByID: %v", err)
+	}
+
+	return &userService.LogoutResponse{}, nil
 }
 
 func (u *usersServer) registerReqToUserModel(r *userService.RegisterRequest) (*models.User, error) {
@@ -178,4 +190,18 @@ func (u *usersServer) userModelToProto(user *models.User) *userService.User {
 		UpdatedAt: timestamppb.New(user.UpdatedAt),
 	}
 	return userProto
+}
+
+func (u *usersServer) getSessionIDFromCtx(ctx context.Context) (string, error) {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return "", status.Error(codes.Unauthenticated, "No ctx metadata")
+	}
+
+	sessionID := md.Get("session_id")
+	if sessionID[0] == "" {
+		return "", status.Error(codes.Unauthenticated, "No ctx metadata")
+	}
+
+	return sessionID[0], nil
 }

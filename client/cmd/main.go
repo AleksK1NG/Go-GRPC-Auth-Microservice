@@ -22,7 +22,7 @@ func main() {
 
 	ctx := context.Background()
 	md := metadata.Pairs(
-		"session_id", "63dc333d-0863-4e9d-899e-bfc7a2ce9217",
+		"session_id", "e0dad68c-f612-42e5-85df-cd7e989330fd",
 		"subsystem", "cli",
 	)
 	ctx = metadata.NewOutgoingContext(ctx, md)
@@ -31,6 +31,11 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	//res, err := client.Logout(ctx, &userService.LogoutRequest{})
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
 
 	log.Printf("RESPONSE: %s", res.String())
 }

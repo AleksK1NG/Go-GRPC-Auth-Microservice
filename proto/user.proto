@@ -68,10 +68,16 @@ message GetMeResponse {
   User user = 1;
 }
 
+
+message LogoutRequest{}
+
+message LogoutResponse {}
+
 service UserService{
   rpc Register(RegisterRequest) returns (RegisterResponse);
   rpc FindByEmail(FindByEmailRequest) returns (FindByEmailResponse);
   rpc FindByID(FindByIDRequest) returns (FindByIDResponse);
   rpc Login(LoginRequest) returns (LoginResponse);
   rpc GetMe(GetMeRequest) returns(GetMeResponse);
+  rpc Logout(LogoutRequest) returns(LogoutResponse);
 }
