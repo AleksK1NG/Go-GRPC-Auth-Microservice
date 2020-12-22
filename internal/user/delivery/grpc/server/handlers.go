@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"github.com/AleksK1NG/auth-microservice/internal/models"
+	"github.com/AleksK1NG/auth-microservice/pkg/grpc_errors"
 	"github.com/AleksK1NG/auth-microservice/pkg/utils"
 	userService "github.com/AleksK1NG/auth-microservice/proto"
 	"github.com/google/uuid"
@@ -20,23 +21,21 @@ func (u *usersServer) Register(ctx context.Context, r *userService.RegisterReque
 	user, err := u.registerReqToUserModel(r)
 	if err != nil {
 		u.logger.Errorf("registerReqToUserModel: %v", err)
-		return nil, status.Errorf(codes.InvalidArgument, "registerReqToUserModel: %v", err)
+		return nil, status.Errorf(grpc_errors.ParseGRPCErrStatusCode(err), "registerReqToUserModel: %v", err)
 	}
 
 	if err := utils.ValidateStruct(ctx, user); err != nil {
 		u.logger.Errorf("ValidateStruct: %v", err)
-		return nil, status.Errorf(codes.InvalidArgument, "ValidateStruct: %v", err)
+		return nil, status.Errorf(grpc_errors.ParseGRPCErrStatusCode(err), "ValidateStruct: %v", err)
 	}
 
 	createdUser, err := u.userUC.Register(ctx, user)
 	if err != nil {
 		u.logger.Errorf("userUC.Register: %v", err)
-		return nil, status.Errorf(codes.Internal, "Register: %v", err)
+		return nil, status.Errorf(grpc_errors.ParseGRPCErrStatusCode(err), "Register: %v", err)
 	}
 
-	return &userService.RegisterResponse{
-		User: u.userModelToProto(createdUser),
-	}, nil
+	return &userService.RegisterResponse{User: u.userModelToProto(createdUser)}, nil
 }
 
 // Find user by email address
@@ -45,7 +44,6 @@ func (u *usersServer) FindByEmail(ctx context.Context, r *userService.FindByEmai
 	defer span.Finish()
 
 	email := r.GetEmail()
-
 	if !utils.ValidateEmail(email) {
 		u.logger.Errorf("ValidateEmail: %v", email)
 		return nil, status.Errorf(codes.InvalidArgument, "ValidateEmail: %v", email)
@@ -54,7 +52,7 @@ func (u *usersServer) FindByEmail(ctx context.Context, r *userService.FindByEmai
 	user, err := u.userUC.FindByEmail(ctx, email)
 	if err != nil {
 		u.logger.Errorf("userUC.FindByEmail: %v", err)
-		return nil, status.Errorf(codes.Internal, "userUC.FindByEmail: %v", err)
+		return nil, status.Errorf(grpc_errors.ParseGRPCErrStatusCode(err), "userUC.FindByEmail: %v", err)
 	}
 
 	return &userService.FindByEmailResponse{User: u.userModelToProto(user)}, err
@@ -68,13 +66,13 @@ func (u *usersServer) FindByID(ctx context.Context, r *userService.FindByIDReque
 	userUUID, err := uuid.Parse(r.GetUuid())
 	if err != nil {
 		u.logger.Errorf("uuid.Parse: %v", err)
-		return nil, status.Errorf(codes.InvalidArgument, "uuid.Parse: %v", err)
+		return nil, status.Errorf(grpc_errors.ParseGRPCErrStatusCode(err), "uuid.Parse: %v", err)
 	}
 
 	user, err := u.userUC.FindById(ctx, userUUID)
 	if err != nil {
 		u.logger.Errorf("userUC.FindById: %v", err)
-		return nil, status.Errorf(codes.Internal, "userUC.FindById: %v", err)
+		return nil, status.Errorf(grpc_errors.ParseGRPCErrStatusCode(err), "userUC.FindById: %v", err)
 	}
 
 	return &userService.FindByIDResponse{User: u.userModelToProto(user)}, nil
