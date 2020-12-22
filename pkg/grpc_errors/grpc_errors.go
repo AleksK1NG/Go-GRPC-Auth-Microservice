@@ -12,7 +12,7 @@ func ParseGRPCErrStatusCode(err error) codes.Code {
 	switch {
 	case errors.Is(err, sql.ErrNoRows):
 		return codes.NotFound
-	case strings.Contains(err.Error(), "email") || strings.Contains(err.Error(), "password"):
+	case strings.Contains(err.Error(), "Validate"):
 		return codes.InvalidArgument
 	}
 

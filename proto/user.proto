@@ -52,8 +52,18 @@ message FindByIDResponse {
   User user = 1;
 }
 
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  User user = 1;
+}
+
 service UserService{
   rpc Register(RegisterRequest) returns (RegisterResponse);
   rpc FindByEmail(FindByEmailRequest) returns (FindByEmailResponse);
   rpc FindByID(FindByIDRequest) returns (FindByIDResponse);
+  rpc Login(LoginRequest) returns (LoginResponse);
 }

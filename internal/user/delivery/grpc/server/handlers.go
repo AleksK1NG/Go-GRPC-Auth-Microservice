@@ -38,6 +38,26 @@ func (u *usersServer) Register(ctx context.Context, r *userService.RegisterReque
 	return &userService.RegisterResponse{User: u.userModelToProto(createdUser)}, nil
 }
 
+// Login user with email and password
+func (u *usersServer) Login(ctx context.Context, r *userService.LoginRequest) (*userService.LoginResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "user.Create")
+	defer span.Finish()
+
+	email := r.GetEmail()
+	if !utils.ValidateEmail(email) {
+		u.logger.Errorf("ValidateEmail: %v", email)
+		return nil, status.Errorf(codes.InvalidArgument, "ValidateEmail: %v", email)
+	}
+
+	user, err := u.userUC.Login(ctx, email, r.GetPassword())
+	if err != nil {
+		u.logger.Errorf("userUC.Login: %v", err)
+		return nil, status.Errorf(grpc_errors.ParseGRPCErrStatusCode(err), "Login: %v", err)
+	}
+
+	return &userService.LoginResponse{User: u.userModelToProto(user)}, err
+}
+
 // Find user by email address
 func (u *usersServer) FindByEmail(ctx context.Context, r *userService.FindByEmailRequest) (*userService.FindByEmailResponse, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "user.Create")
