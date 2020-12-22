@@ -12,31 +12,32 @@ import (
 
 // Auth UseCase
 type userUseCase struct {
-	logger   logger.Logger
-	userRepo user.UserRepository
+	logger     logger.Logger
+	userPgRepo user.UserPGRepository
+	redisRepo  user.UserRedisRepository
 }
 
 // New Auth UseCase
-func NewUserUseCase(logger logger.Logger, userRepo user.UserRepository) *userUseCase {
-	return &userUseCase{logger: logger, userRepo: userRepo}
+func NewUserUseCase(logger logger.Logger, userRepo user.UserPGRepository, redisRepo user.UserRedisRepository) *userUseCase {
+	return &userUseCase{logger: logger, userPgRepo: userRepo, redisRepo: redisRepo}
 }
 
 // Register new user
-func (u userUseCase) Register(ctx context.Context, user *models.User) (*models.User, error) {
+func (u *userUseCase) Register(ctx context.Context, user *models.User) (*models.User, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "UserUseCase.Create")
 	defer span.Finish()
 
-	return u.userRepo.Create(ctx, user)
+	return u.userPgRepo.Create(ctx, user)
 }
 
 // Find use by email address
-func (u userUseCase) FindByEmail(ctx context.Context, email string) (*models.User, error) {
+func (u *userUseCase) FindByEmail(ctx context.Context, email string) (*models.User, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "UserUseCase.FindByEmail")
 	defer span.Finish()
 
-	findByEmail, err := u.userRepo.FindByEmail(ctx, email)
+	findByEmail, err := u.userPgRepo.FindByEmail(ctx, email)
 	if err != nil {
-		return nil, errors.Wrap(err, "userRepo.FindByEmail")
+		return nil, errors.Wrap(err, "userPgRepo.FindByEmail")
 	}
 
 	findByEmail.SanitizePassword()
@@ -45,19 +46,31 @@ func (u userUseCase) FindByEmail(ctx context.Context, email string) (*models.Use
 }
 
 // Find use by uuid
-func (u userUseCase) FindById(ctx context.Context, userID uuid.UUID) (*models.User, error) {
+func (u *userUseCase) FindById(ctx context.Context, userID uuid.UUID) (*models.User, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "UserUseCase.FindById")
 	defer span.Finish()
 
-	return u.userRepo.FindById(ctx, userID)
+	if cachedUser := u.redisRepo.GetByIDCtx(ctx, userID.String()); cachedUser != nil {
+		u.logger.Info("REDIS CACHE CALL")
+		return cachedUser, nil
+	}
+
+	foundUser, err := u.userPgRepo.FindById(ctx, userID)
+	if err != nil {
+		return nil, errors.Wrap(err, "userPgRepo.FindById")
+	}
+
+	u.redisRepo.SetUserCtx(ctx, foundUser.UserID.String(), 3600, foundUser)
+
+	return foundUser, nil
 }
 
 // Login user with email and password
-func (u userUseCase) Login(ctx context.Context, email string, password string) (*models.User, error) {
+func (u *userUseCase) Login(ctx context.Context, email string, password string) (*models.User, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "UserUseCase.FindById")
 	defer span.Finish()
 
-	foundUser, err := u.userRepo.FindByEmail(ctx, email)
+	foundUser, err := u.userPgRepo.FindByEmail(ctx, email)
 	if err != nil {
 		return nil, err
 	}

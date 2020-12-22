@@ -12,7 +12,6 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
-	"log"
 )
 
 // Register new user
@@ -44,13 +43,6 @@ func (u *usersServer) Register(ctx context.Context, r *userService.RegisterReque
 func (u *usersServer) Login(ctx context.Context, r *userService.LoginRequest) (*userService.LoginResponse, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "user.Create")
 	defer span.Finish()
-
-	incomingContext, ok := metadata.FromIncomingContext(ctx)
-	if ok {
-		for k, v := range incomingContext {
-			log.Printf("key: %v, value: %v", k, v)
-		}
-	}
 
 	email := r.GetEmail()
 	if !utils.ValidateEmail(email) {

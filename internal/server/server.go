@@ -38,7 +38,8 @@ func (s *Server) Run() error {
 	im := interceptors.NewInterceptorManager(s.logger, s.cfg)
 	userRepo := userRepository.NewUserRepository(s.db)
 	sessRepo := sessRepository.NewSessionRepository(s.redisClient, s.cfg)
-	userUC := userUseCase.NewUserUseCase(s.logger, userRepo)
+	userRedisRepo := userRepository.NewUserRedisRepo(s.redisClient, s.logger)
+	userUC := userUseCase.NewUserUseCase(s.logger, userRepo, userRedisRepo)
 	sessUC := sessUseCase.NewSessionUseCase(sessRepo, s.cfg)
 
 	l, err := net.Listen("tcp", s.cfg.Server.Port)
