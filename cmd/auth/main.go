@@ -3,15 +3,12 @@ package main
 import (
 	"github.com/AleksK1NG/auth-microservice/config"
 	"github.com/AleksK1NG/auth-microservice/internal/server"
+	jaegerTracer "github.com/AleksK1NG/auth-microservice/pkg/jaeger"
 	"github.com/AleksK1NG/auth-microservice/pkg/logger"
 	"github.com/AleksK1NG/auth-microservice/pkg/postgres"
 	"github.com/AleksK1NG/auth-microservice/pkg/redis"
 	"github.com/AleksK1NG/auth-microservice/pkg/utils"
 	"github.com/opentracing/opentracing-go"
-	"github.com/uber/jaeger-client-go"
-	jaegercfg "github.com/uber/jaeger-client-go/config"
-	jaegerlog "github.com/uber/jaeger-client-go/log"
-	"github.com/uber/jaeger-lib/metrics"
 	"log"
 	"os"
 )
@@ -47,22 +44,7 @@ func main() {
 	defer redisClient.Close()
 	appLogger.Info("Redis connected")
 
-	jaegerCfgInstance := jaegercfg.Configuration{
-		ServiceName: cfg.Jaeger.ServiceName,
-		Sampler: &jaegercfg.SamplerConfig{
-			Type:  jaeger.SamplerTypeConst,
-			Param: 1,
-		},
-		Reporter: &jaegercfg.ReporterConfig{
-			LogSpans:           cfg.Jaeger.LogSpans,
-			LocalAgentHostPort: cfg.Jaeger.Host,
-		},
-	}
-
-	tracer, closer, err := jaegerCfgInstance.NewTracer(
-		jaegercfg.Logger(jaegerlog.StdLogger),
-		jaegercfg.Metrics(metrics.NullFactory),
-	)
+	tracer, closer, err := jaegerTracer.InitJaeger(cfg)
 	if err != nil {
 		log.Fatal("cannot create tracer", err)
 	}
