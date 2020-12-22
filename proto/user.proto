@@ -12,29 +12,35 @@ message Session {
 }
 
 message User {
-  string email = 1;
-  string firstName = 2;
-  string lastName = 3;
+  string uuid = 1;
+  string first_name = 2;
+  string last_name = 3;
   string password = 5;
-  string UUID = 6;
-  google.protobuf.Timestamp createdAt = 7;
-  google.protobuf.Timestamp updatedAt = 8;
+  string email = 6;
+  string role = 7;
+  string avatar = 8;
+  google.protobuf.Timestamp created_at = 9;
+  google.protobuf.Timestamp updated_at = 10;
 }
 
 message RegisterRequest {
   string email = 1;
-  string firstName = 2;
-  string lastName = 3;
+  string first_name = 2;
+  string last_name = 3;
   string password = 5;
+  string role = 6;
+  string avatar = 7;
 }
 
 message RegisterResponse {
-  string email = 1;
-  string firstName = 2;
-  string lastName = 3;
-  string UUID = 4;
-  google.protobuf.Timestamp createdAt = 5;
-  google.protobuf.Timestamp updatedAt = 6;
+  string uuid = 1;
+  string first_name = 2;
+  string last_name = 3;
+  string email = 4;
+  string role = 5;
+  string avatar = 6;
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp updated_at = 8;
 }
 
 
