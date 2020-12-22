@@ -9,6 +9,7 @@ import (
 	"github.com/AleksK1NG/auth-microservice/pkg/logger"
 	userService "github.com/AleksK1NG/auth-microservice/proto"
 	"github.com/go-redis/redis/v8"
+	grpcrecovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	"github.com/jmoiron/sqlx"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
@@ -47,6 +48,7 @@ func (s *Server) Run() error {
 		MaxConnectionAge:  5 * time.Minute,
 	}),
 		grpc.UnaryInterceptor(im.Logger),
+		grpc.ChainUnaryInterceptor(grpcrecovery.UnaryServerInterceptor()),
 	)
 
 	if s.cfg.Server.Mode != "Production" {
