@@ -47,7 +47,7 @@ func (u *usersServer) Register(ctx context.Context, r *userService.RegisterReque
 		Email:     createdUser.Email,
 		FirstName: createdUser.FirstName,
 		LastName:  createdUser.LastName,
-		UUID:      uuid.New().String(),
+		Uuid:      uuid.New().String(),
 		CreatedAt: timestamppb.New(time.Now()),
 	}, nil
 }
