@@ -36,7 +36,24 @@ message RegisterResponse {
   User user = 1;
 }
 
+message FindByEmailRequest {
+  string email = 1;
+}
+
+message FindByEmailResponse {
+  User user = 1;
+}
+
+message FindByIDRequest {
+  string uuid = 1;
+}
+
+message FindByIDResponse {
+  User user = 1;
+}
 
 service UserService{
   rpc Register(RegisterRequest) returns (RegisterResponse);
+  rpc FindByEmail(FindByEmailRequest) returns (FindByEmailResponse);
+  rpc FindByID(FindByIDRequest) returns (FindByIDResponse);
 }

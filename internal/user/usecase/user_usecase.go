@@ -37,7 +37,7 @@ func (u userUseCase) FindByEmail(ctx context.Context, email string) (*models.Use
 }
 
 // Find use by uuid
-func (u userUseCase) FindById(ctx context.Context, userID *uuid.UUID) (*models.User, error) {
+func (u userUseCase) FindById(ctx context.Context, userID uuid.UUID) (*models.User, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "UserUseCase.FindById")
 	defer span.Finish()
 

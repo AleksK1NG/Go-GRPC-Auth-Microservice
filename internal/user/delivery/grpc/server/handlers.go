@@ -5,6 +5,7 @@ import (
 	"github.com/AleksK1NG/auth-microservice/internal/models"
 	"github.com/AleksK1NG/auth-microservice/pkg/utils"
 	userService "github.com/AleksK1NG/auth-microservice/proto"
+	"github.com/google/uuid"
 	"github.com/opentracing/opentracing-go"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -30,12 +31,53 @@ func (u *usersServer) Register(ctx context.Context, r *userService.RegisterReque
 	createdUser, err := u.userUC.Register(ctx, user)
 	if err != nil {
 		u.logger.Errorf("userUC.Register: %v", err)
-		return nil, status.Errorf(codes.Internal, "userUC.Register: %v", err)
+		return nil, status.Errorf(codes.Internal, "Register: %v", err)
 	}
 
 	return &userService.RegisterResponse{
 		User: u.userModelToProto(createdUser),
 	}, nil
+}
+
+// Find user by email address
+func (u *usersServer) FindByEmail(ctx context.Context, r *userService.FindByEmailRequest) (*userService.FindByEmailResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "user.Create")
+	defer span.Finish()
+
+	email := r.GetEmail()
+
+	if !utils.ValidateEmail(email) {
+		u.logger.Errorf("ValidateEmail: %v", email)
+		return nil, status.Errorf(codes.InvalidArgument, "ValidateEmail: %v", email)
+	}
+
+	user, err := u.userUC.FindByEmail(ctx, email)
+	if err != nil {
+		u.logger.Errorf("userUC.FindByEmail: %v", err)
+		return nil, status.Errorf(codes.Internal, "userUC.FindByEmail: %v", err)
+	}
+
+	return &userService.FindByEmailResponse{User: u.userModelToProto(user)}, err
+}
+
+// Find user by uuid
+func (u *usersServer) FindByID(ctx context.Context, r *userService.FindByIDRequest) (*userService.FindByIDResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "user.Create")
+	defer span.Finish()
+
+	userUUID, err := uuid.Parse(r.GetUuid())
+	if err != nil {
+		u.logger.Errorf("uuid.Parse: %v", err)
+		return nil, status.Errorf(codes.InvalidArgument, "uuid.Parse: %v", err)
+	}
+
+	user, err := u.userUC.FindById(ctx, userUUID)
+	if err != nil {
+		u.logger.Errorf("userUC.FindById: %v", err)
+		return nil, status.Errorf(codes.Internal, "userUC.FindById: %v", err)
+	}
+
+	return &userService.FindByIDResponse{User: u.userModelToProto(user)}, nil
 }
 
 func (u *usersServer) registerReqToUserModel(r *userService.RegisterRequest) (*models.User, error) {
