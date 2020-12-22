@@ -23,5 +23,6 @@ func NewUserUseCase(logger logger.Logger, userRepo user.UserRepository) *userUse
 func (u userUseCase) Register(ctx context.Context, user *models.User) (*models.User, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "UserUseCase.Register")
 	defer span.Finish()
+
 	return u.userRepo.Register(ctx, user)
 }
