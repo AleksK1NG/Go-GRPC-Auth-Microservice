@@ -29,8 +29,8 @@ func (u *usersServer) Register(ctx context.Context, r *userService.RegisterReque
 
 	createdUser, err := u.userUC.Register(ctx, user)
 	if err != nil {
-		u.logger.Errorf("userUC.Create: %v", err)
-		return nil, err
+		u.logger.Errorf("userUC.Register: %v", err)
+		return nil, status.Errorf(codes.Internal, "userUC.Register: %v", err)
 	}
 
 	return &userService.RegisterResponse{
