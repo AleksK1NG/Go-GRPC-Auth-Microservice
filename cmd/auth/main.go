@@ -35,8 +35,6 @@ func main() {
 	psqlDB, err := postgres.NewPsqlDB(cfg)
 	if err != nil {
 		appLogger.Fatalf("Postgresql init: %s", err)
-	} else {
-		appLogger.Infof("Postgres connected, Status: %#v", psqlDB.Stats())
 	}
 	defer psqlDB.Close()
 
@@ -46,7 +44,7 @@ func main() {
 
 	tracer, closer, err := jaegerTracer.InitJaeger(cfg)
 	if err != nil {
-		log.Fatal("cannot create tracer", err)
+		appLogger.Fatal("cannot create tracer", err)
 	}
 	appLogger.Info("Jaeger connected")
 
