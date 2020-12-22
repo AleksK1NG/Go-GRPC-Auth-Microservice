@@ -33,14 +33,7 @@ message RegisterRequest {
 }
 
 message RegisterResponse {
-  string uuid = 1;
-  string first_name = 2;
-  string last_name = 3;
-  string email = 4;
-  string role = 5;
-  string avatar = 6;
-  google.protobuf.Timestamp created_at = 7;
-  google.protobuf.Timestamp updated_at = 8;
+  User user = 1;
 }
 
 
