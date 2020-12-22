@@ -2,6 +2,8 @@
 
 syntax = "proto3";
 
+import "google/protobuf/timestamp.proto";
+
 package userService;
 option go_package = ".;userService";
 
@@ -14,7 +16,9 @@ message User {
   string firstName = 2;
   string lastName = 3;
   string password = 5;
-  int64 userID = 6;
+  string UUID = 6;
+  google.protobuf.Timestamp createdAt = 7;
+  google.protobuf.Timestamp updatedAt = 8;
 }
 
 message RegisterRequest {
@@ -28,7 +32,9 @@ message RegisterResponse {
   string email = 1;
   string firstName = 2;
   string lastName = 3;
-  int64 userID = 4;
+  string UUID = 4;
+  google.protobuf.Timestamp createdAt = 5;
+  google.protobuf.Timestamp updatedAt = 6;
 }
 
 

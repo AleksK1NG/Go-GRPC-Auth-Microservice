@@ -7,9 +7,12 @@ import (
 	"github.com/AleksK1NG/auth-microservice/internal/user"
 	"github.com/AleksK1NG/auth-microservice/pkg/logger"
 	"github.com/AleksK1NG/auth-microservice/proto"
+	"github.com/google/uuid"
 	"github.com/opentracing/opentracing-go"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/timestamppb"
+	"time"
 )
 
 type usersServer struct {
@@ -44,6 +47,7 @@ func (u *usersServer) Register(ctx context.Context, r *userService.RegisterReque
 		Email:     createdUser.Email,
 		FirstName: createdUser.FirstName,
 		LastName:  createdUser.LastName,
-		UserID:    createdUser.UserID,
+		UUID:      uuid.New().String(),
+		CreatedAt: timestamppb.New(time.Now()),
 	}, nil
 }
