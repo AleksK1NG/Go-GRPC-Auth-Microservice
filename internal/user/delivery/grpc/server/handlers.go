@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"github.com/AleksK1NG/auth-microservice/internal/models"
+	"github.com/AleksK1NG/auth-microservice/pkg/utils"
 	userService "github.com/AleksK1NG/auth-microservice/proto"
 	"github.com/opentracing/opentracing-go"
 	"google.golang.org/grpc/codes"
@@ -15,14 +16,20 @@ func (u *usersServer) Register(ctx context.Context, r *userService.RegisterReque
 	span, ctx := opentracing.StartSpanFromContext(ctx, "user.Register")
 	defer span.Finish()
 
-	u.logger.Infof("Get request %s\n", r.String())
 	user, err := u.registerReqToUserModel(r)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "registerReqToUserModel: %#v", err)
+		u.logger.Errorf("registerReqToUserModel: %v", err)
+		return nil, status.Errorf(codes.InvalidArgument, "registerReqToUserModel: %v", err)
+	}
+
+	if err := utils.ValidateStruct(ctx, user); err != nil {
+		u.logger.Errorf("ValidateStruct: %v", err)
+		return nil, status.Errorf(codes.InvalidArgument, "ValidateStruct: %v", err)
 	}
 
 	createdUser, err := u.userUC.Register(ctx, user)
 	if err != nil {
+		u.logger.Errorf("userUC.Register: %v", err)
 		return nil, err
 	}
 
