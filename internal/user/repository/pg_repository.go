@@ -50,7 +50,7 @@ func (u *UserRepository) FindByEmail(ctx context.Context, email string) (*models
 }
 
 // Find user by uuid
-func (u *UserRepository) FindById(ctx context.Context, userID *uuid.UUID) (*models.User, error) {
+func (u *UserRepository) FindById(ctx context.Context, userID uuid.UUID) (*models.User, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "UserRepository.Create")
 	defer span.Finish()
 
