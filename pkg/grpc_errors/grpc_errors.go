@@ -35,6 +35,12 @@ func ParseGRPCErrStatusCode(err error) codes.Code {
 		return codes.PermissionDenied
 	case strings.Contains(err.Error(), "Validate"):
 		return codes.InvalidArgument
+	case strings.Contains(err.Error(), "redis"):
+		return codes.NotFound
+	case errors.Is(err, context.Canceled):
+		return codes.Canceled
+	case errors.Is(err, context.DeadlineExceeded):
+		return codes.DeadlineExceeded
 	}
 	return codes.Internal
 }
