@@ -7,7 +7,7 @@ import (
 )
 
 // User pg repository
-type UserRepository interface {
+type UserPGRepository interface {
 	Create(ctx context.Context, user *models.User) (*models.User, error)
 	FindByEmail(ctx context.Context, email string) (*models.User, error)
 	FindById(ctx context.Context, userID uuid.UUID) (*models.User, error)

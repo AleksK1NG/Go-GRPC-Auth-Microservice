@@ -5,7 +5,7 @@ import (
 	"github.com/AleksK1NG/auth-microservice/internal/interceptors"
 	sessRepository "github.com/AleksK1NG/auth-microservice/internal/session/repository"
 	sessUseCase "github.com/AleksK1NG/auth-microservice/internal/session/usecase"
-	authServerGRPC "github.com/AleksK1NG/auth-microservice/internal/user/delivery/grpc/server"
+	authServerGRPC "github.com/AleksK1NG/auth-microservice/internal/user/delivery/grpc/service"
 	userRepository "github.com/AleksK1NG/auth-microservice/internal/user/repository"
 	userUseCase "github.com/AleksK1NG/auth-microservice/internal/user/usecase"
 	"github.com/AleksK1NG/auth-microservice/pkg/logger"
@@ -33,12 +33,13 @@ func NewAuthServer(logger logger.Logger, cfg *config.Config, db *sqlx.DB, redisC
 	return &Server{logger: logger, cfg: cfg, db: db, redisClient: redisClient}
 }
 
-// Run server
+// Run service
 func (s *Server) Run() error {
 	im := interceptors.NewInterceptorManager(s.logger, s.cfg)
 	userRepo := userRepository.NewUserRepository(s.db)
 	sessRepo := sessRepository.NewSessionRepository(s.redisClient, s.cfg)
-	userUC := userUseCase.NewUserUseCase(s.logger, userRepo)
+	userRedisRepo := userRepository.NewUserRedisRepo(s.redisClient, s.logger)
+	userUC := userUseCase.NewUserUseCase(s.logger, userRepo, userRedisRepo)
 	sessUC := sessUseCase.NewSessionUseCase(sessRepo, s.cfg)
 
 	l, err := net.Listen("tcp", s.cfg.Server.Port)
@@ -47,9 +48,10 @@ func (s *Server) Run() error {
 	}
 
 	server := grpc.NewServer(grpc.KeepaliveParams(keepalive.ServerParameters{
-		MaxConnectionIdle: 5 * time.Minute,
-		Timeout:           15 * time.Second,
-		MaxConnectionAge:  5 * time.Minute,
+		MaxConnectionIdle: s.cfg.Server.MaxConnectionIdle * time.Minute,
+		Timeout:           s.cfg.Server.Timeout * time.Second,
+		MaxConnectionAge:  s.cfg.Server.MaxConnectionAge * time.Minute,
+		Time:              s.cfg.Server.Timeout * time.Minute,
 	}),
 		grpc.UnaryInterceptor(im.Logger),
 		grpc.ChainUnaryInterceptor(grpcrecovery.UnaryServerInterceptor()),
