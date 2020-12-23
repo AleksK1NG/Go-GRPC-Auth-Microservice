@@ -31,10 +31,6 @@
     make local
     make run
 
-### SWAGGER UI:
-
-https://localhost:5000/swagger/index.html
-
 ### Jaeger UI:
 
 http://localhost:16686
