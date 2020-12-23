@@ -50,7 +50,7 @@ func (s *Server) Run() error {
 	)
 
 	im := interceptors.NewInterceptorManager(s.logger, s.cfg, metrics)
-	userRepo := userRepository.NewUserRepository(s.db)
+	userRepo := userRepository.NewUserPGRepository(s.db)
 	sessRepo := sessRepository.NewSessionRepository(s.redisClient, s.cfg)
 	userRedisRepo := userRepository.NewUserRedisRepo(s.redisClient, s.logger)
 	userUC := userUseCase.NewUserUseCase(s.logger, userRepo, userRedisRepo)

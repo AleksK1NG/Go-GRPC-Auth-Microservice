@@ -3,6 +3,7 @@ module github.com/AleksK1NG/auth-microservice
 go 1.15
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/alicebob/gopher-json v0.0.0-20200520072559-a9ecdc9d1d3a // indirect
 	github.com/alicebob/miniredis v2.5.0+incompatible
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
