@@ -79,7 +79,7 @@ func (s *Server) Run() error {
 		reflection.Register(server)
 	}
 
-	authGRPCServer := authServerGRPC.NewAuthServerGRPC(s.logger, s.cfg, userUC, sessUC)
+	authGRPCServer := authServerGRPC.NewAuthServerGRPC(s.logger, s.cfg, userUC, sessUC, metrics)
 	userService.RegisterUserServiceServer(server, authGRPCServer)
 
 	grpc_prometheus.Register(server)
