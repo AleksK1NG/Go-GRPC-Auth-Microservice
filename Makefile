@@ -72,7 +72,7 @@ docker:
 					   -p 14250:14250 \
 					   -p 9411:9411 \
 					   jaegertracing/all-in-one:1.21
-	docker-compose -f docker-compose.dev.yml up --build
+	docker-compose -f docker-compose.yml up --build
 
 docker_delve:
 	echo "Starting docker debug environment"
