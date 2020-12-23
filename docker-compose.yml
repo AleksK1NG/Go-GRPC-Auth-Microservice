@@ -1,0 +1,85 @@
+version: "3.8"
+
+services:
+  auth_microservice:
+    container_name: auth_microservice
+    build:
+      context: ./
+      dockerfile: docker/Dockerfile.HotReload
+    ports:
+      - "5000:5000"
+      - "5555:5555"
+      - "7070:7070"
+    environment:
+      - PORT=5000
+    depends_on:
+      - postgesql
+      - redis
+      - prometheus
+      - node_exporter
+      - grafana
+    restart: always
+    volumes:
+      - ./:/app
+    networks:
+      - auth_network
+
+  redis:
+    image: redis:6.0.9-alpine
+    container_name: auth_redis
+    ports:
+      - "6379:6379"
+    restart: always
+    networks:
+      - auth_network
+
+  postgesql:
+    image: postgres:13-alpine
+    container_name: auth_postgesql
+    ports:
+      - "5432:5432"
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=auth_db
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    networks:
+      - auth_network
+
+  prometheus:
+    container_name: prometheus_container
+    image: prom/prometheus
+    volumes:
+      - ./docker/monitoring/prometheus-local.yml:/etc/prometheus/prometheus.yml:Z
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention=20d'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - '9090:9090'
+    networks:
+      - auth_network
+
+  node_exporter:
+    container_name: node_exporter_container
+    image: prom/node-exporter
+    ports:
+      - '9101:9100'
+    networks:
+      - auth_network
+
+  grafana:
+    container_name: grafana_container
+    image: grafana/grafana
+    ports:
+      - '3000:3000'
+    networks:
+      - auth_network
+
+networks:
+  auth_network:
+    driver: bridge
