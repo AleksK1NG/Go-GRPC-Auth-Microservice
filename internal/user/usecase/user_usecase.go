@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/AleksK1NG/auth-microservice/internal/models"
 	"github.com/AleksK1NG/auth-microservice/internal/user"
+	"github.com/AleksK1NG/auth-microservice/pkg/grpc_errors"
 	"github.com/AleksK1NG/auth-microservice/pkg/logger"
 	"github.com/google/uuid"
 	"github.com/opentracing/opentracing-go"
@@ -30,6 +31,11 @@ func NewUserUseCase(logger logger.Logger, userRepo user.UserPGRepository, redisR
 func (u *userUseCase) Register(ctx context.Context, user *models.User) (*models.User, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "UserUseCase.Register")
 	defer span.Finish()
+
+	existsUser, err := u.userPgRepo.FindByEmail(ctx, user.Email)
+	if existsUser != nil || err == nil {
+		return nil, grpc_errors.ErrEmailExists
+	}
 
 	return u.userPgRepo.Create(ctx, user)
 }

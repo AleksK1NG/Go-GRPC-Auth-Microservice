@@ -13,6 +13,7 @@ var (
 	ErrNotFound         = errors.New("Not found")
 	ErrNoCtxMetaData    = errors.New("No ctx metadata")
 	ErrInvalidSessionId = errors.New("Invalid session id")
+	ErrEmailExists      = errors.New("Email already exists")
 )
 
 // Parse error and get code
@@ -26,6 +27,12 @@ func ParseGRPCErrStatusCode(err error) codes.Code {
 		return codes.Canceled
 	case errors.Is(err, context.DeadlineExceeded):
 		return codes.DeadlineExceeded
+	case errors.Is(err, ErrEmailExists):
+		return codes.AlreadyExists
+	case errors.Is(err, ErrNoCtxMetaData):
+		return codes.Unauthenticated
+	case errors.Is(err, ErrInvalidSessionId):
+		return codes.PermissionDenied
 	case strings.Contains(err.Error(), "Validate"):
 		return codes.InvalidArgument
 	}
