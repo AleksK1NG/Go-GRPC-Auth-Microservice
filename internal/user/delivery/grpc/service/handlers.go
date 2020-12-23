@@ -1,4 +1,4 @@
-package server
+package service
 
 import (
 	"context"
@@ -6,8 +6,10 @@ import (
 	"github.com/AleksK1NG/auth-microservice/pkg/grpc_errors"
 	"github.com/AleksK1NG/auth-microservice/pkg/utils"
 	userService "github.com/AleksK1NG/auth-microservice/proto"
+	"github.com/go-redis/redis/v8"
 	"github.com/google/uuid"
 	"github.com/opentracing/opentracing-go"
+	"github.com/pkg/errors"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
@@ -15,7 +17,7 @@ import (
 )
 
 // Register new user
-func (u *usersServer) Register(ctx context.Context, r *userService.RegisterRequest) (*userService.RegisterResponse, error) {
+func (u *usersService) Register(ctx context.Context, r *userService.RegisterRequest) (*userService.RegisterResponse, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "user.Create")
 	defer span.Finish()
 
@@ -40,7 +42,7 @@ func (u *usersServer) Register(ctx context.Context, r *userService.RegisterReque
 }
 
 // Login user with email and password
-func (u *usersServer) Login(ctx context.Context, r *userService.LoginRequest) (*userService.LoginResponse, error) {
+func (u *usersService) Login(ctx context.Context, r *userService.LoginRequest) (*userService.LoginResponse, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "user.Create")
 	defer span.Finish()
 
@@ -68,7 +70,7 @@ func (u *usersServer) Login(ctx context.Context, r *userService.LoginRequest) (*
 }
 
 // Find user by email address
-func (u *usersServer) FindByEmail(ctx context.Context, r *userService.FindByEmailRequest) (*userService.FindByEmailResponse, error) {
+func (u *usersService) FindByEmail(ctx context.Context, r *userService.FindByEmailRequest) (*userService.FindByEmailResponse, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "user.Create")
 	defer span.Finish()
 
@@ -88,7 +90,7 @@ func (u *usersServer) FindByEmail(ctx context.Context, r *userService.FindByEmai
 }
 
 // Find user by uuid
-func (u *usersServer) FindByID(ctx context.Context, r *userService.FindByIDRequest) (*userService.FindByIDResponse, error) {
+func (u *usersService) FindByID(ctx context.Context, r *userService.FindByIDRequest) (*userService.FindByIDResponse, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "user.Create")
 	defer span.Finish()
 
@@ -108,19 +110,22 @@ func (u *usersServer) FindByID(ctx context.Context, r *userService.FindByIDReque
 }
 
 // Get session id from, ctx metadata, find user by uuid and returns it
-func (u *usersServer) GetMe(ctx context.Context, r *userService.GetMeRequest) (*userService.GetMeResponse, error) {
+func (u *usersService) GetMe(ctx context.Context, r *userService.GetMeRequest) (*userService.GetMeResponse, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "user.Create")
 	defer span.Finish()
 
 	sessID, err := u.getSessionIDFromCtx(ctx)
 	if err != nil {
 		u.logger.Errorf("getSessionIDFromCtx: %v", err)
-		return nil, err
+		return nil, status.Errorf(grpc_errors.ParseGRPCErrStatusCode(err), "sessUC.getSessionIDFromCtx: %v", err)
 	}
 
 	session, err := u.sessUC.GetSessionByID(ctx, sessID)
 	if err != nil {
 		u.logger.Errorf("sessUC.GetSessionByID: %v", err)
+		if errors.Is(err, redis.Nil) {
+			return nil, status.Errorf(codes.NotFound, "sessUC.GetSessionByID: %v", grpc_errors.ErrNotFound)
+		}
 		return nil, status.Errorf(grpc_errors.ParseGRPCErrStatusCode(err), "sessUC.GetSessionByID: %v", err)
 	}
 
@@ -134,7 +139,7 @@ func (u *usersServer) GetMe(ctx context.Context, r *userService.GetMeRequest) (*
 }
 
 // Logout user, delete current session
-func (u *usersServer) Logout(ctx context.Context, request *userService.LogoutRequest) (*userService.LogoutResponse, error) {
+func (u *usersService) Logout(ctx context.Context, request *userService.LogoutRequest) (*userService.LogoutResponse, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "user.Create")
 	defer span.Finish()
 
@@ -152,7 +157,7 @@ func (u *usersServer) Logout(ctx context.Context, request *userService.LogoutReq
 	return &userService.LogoutResponse{}, nil
 }
 
-func (u *usersServer) registerReqToUserModel(r *userService.RegisterRequest) (*models.User, error) {
+func (u *usersService) registerReqToUserModel(r *userService.RegisterRequest) (*models.User, error) {
 	candidate := &models.User{
 		Email:     r.GetEmail(),
 		FirstName: r.GetFirstName(),
@@ -169,7 +174,7 @@ func (u *usersServer) registerReqToUserModel(r *userService.RegisterRequest) (*m
 	return candidate, nil
 }
 
-func (u *usersServer) userModelToProto(user *models.User) *userService.User {
+func (u *usersService) userModelToProto(user *models.User) *userService.User {
 	userProto := &userService.User{
 		Uuid:      user.UserID.String(),
 		FirstName: user.FirstName,
@@ -184,15 +189,15 @@ func (u *usersServer) userModelToProto(user *models.User) *userService.User {
 	return userProto
 }
 
-func (u *usersServer) getSessionIDFromCtx(ctx context.Context) (string, error) {
+func (u *usersService) getSessionIDFromCtx(ctx context.Context) (string, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
-		return "", status.Error(codes.Unauthenticated, "No ctx metadata")
+		return "", status.Errorf(codes.Unauthenticated, "metadata.FromIncomingContext: %v", grpc_errors.ErrNoCtxMetaData)
 	}
 
 	sessionID := md.Get("session_id")
 	if sessionID[0] == "" {
-		return "", status.Error(codes.Unauthenticated, "No ctx metadata")
+		return "", status.Errorf(codes.Unauthenticated, "md.Get sessionId: %v", grpc_errors.ErrInvalidSessionId)
 	}
 
 	return sessionID[0], nil

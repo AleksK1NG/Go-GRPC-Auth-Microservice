@@ -10,21 +10,25 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Auth UseCase
+const (
+	userByIdCacheDuration = 3600
+)
+
+// User UseCase
 type userUseCase struct {
 	logger     logger.Logger
 	userPgRepo user.UserPGRepository
 	redisRepo  user.UserRedisRepository
 }
 
-// New Auth UseCase
+// New User UseCase
 func NewUserUseCase(logger logger.Logger, userRepo user.UserPGRepository, redisRepo user.UserRedisRepository) *userUseCase {
 	return &userUseCase{logger: logger, userPgRepo: userRepo, redisRepo: redisRepo}
 }
 
 // Register new user
 func (u *userUseCase) Register(ctx context.Context, user *models.User) (*models.User, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "UserUseCase.Create")
+	span, ctx := opentracing.StartSpanFromContext(ctx, "UserUseCase.Register")
 	defer span.Finish()
 
 	return u.userPgRepo.Create(ctx, user)
@@ -51,7 +55,6 @@ func (u *userUseCase) FindById(ctx context.Context, userID uuid.UUID) (*models.U
 	defer span.Finish()
 
 	if cachedUser := u.redisRepo.GetByIDCtx(ctx, userID.String()); cachedUser != nil {
-		u.logger.Info("REDIS CACHE CALL")
 		return cachedUser, nil
 	}
 
@@ -60,19 +63,19 @@ func (u *userUseCase) FindById(ctx context.Context, userID uuid.UUID) (*models.U
 		return nil, errors.Wrap(err, "userPgRepo.FindById")
 	}
 
-	u.redisRepo.SetUserCtx(ctx, foundUser.UserID.String(), 3600, foundUser)
+	u.redisRepo.SetUserCtx(ctx, foundUser.UserID.String(), userByIdCacheDuration, foundUser)
 
 	return foundUser, nil
 }
 
 // Login user with email and password
 func (u *userUseCase) Login(ctx context.Context, email string, password string) (*models.User, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "UserUseCase.FindById")
+	span, ctx := opentracing.StartSpanFromContext(ctx, "UserUseCase.Login")
 	defer span.Finish()
 
 	foundUser, err := u.userPgRepo.FindByEmail(ctx, email)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "userPgRepo.FindByEmail")
 	}
 
 	if err := foundUser.ComparePasswords(password); err != nil {

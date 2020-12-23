@@ -5,7 +5,7 @@ import (
 	"github.com/AleksK1NG/auth-microservice/internal/interceptors"
 	sessRepository "github.com/AleksK1NG/auth-microservice/internal/session/repository"
 	sessUseCase "github.com/AleksK1NG/auth-microservice/internal/session/usecase"
-	authServerGRPC "github.com/AleksK1NG/auth-microservice/internal/user/delivery/grpc/server"
+	authServerGRPC "github.com/AleksK1NG/auth-microservice/internal/user/delivery/grpc/service"
 	userRepository "github.com/AleksK1NG/auth-microservice/internal/user/repository"
 	userUseCase "github.com/AleksK1NG/auth-microservice/internal/user/usecase"
 	"github.com/AleksK1NG/auth-microservice/pkg/logger"
@@ -33,7 +33,7 @@ func NewAuthServer(logger logger.Logger, cfg *config.Config, db *sqlx.DB, redisC
 	return &Server{logger: logger, cfg: cfg, db: db, redisClient: redisClient}
 }
 
-// Run server
+// Run service
 func (s *Server) Run() error {
 	im := interceptors.NewInterceptorManager(s.logger, s.cfg)
 	userRepo := userRepository.NewUserRepository(s.db)

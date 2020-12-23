@@ -30,6 +30,9 @@ func (r *userRedisRepo) GetByIDCtx(ctx context.Context, key string) *models.User
 
 	userBytes, err := r.redisClient.Get(ctx, r.createKey(key)).Bytes()
 	if err != nil {
+		if err != redis.Nil {
+			r.logger.Errorf("redisClient.Get: %v", err)
+		}
 		return nil
 	}
 	user := &models.User{}
