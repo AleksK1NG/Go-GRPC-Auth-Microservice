@@ -48,9 +48,10 @@ func (s *Server) Run() error {
 	}
 
 	server := grpc.NewServer(grpc.KeepaliveParams(keepalive.ServerParameters{
-		MaxConnectionIdle: 5 * time.Minute,
-		Timeout:           15 * time.Second,
-		MaxConnectionAge:  5 * time.Minute,
+		MaxConnectionIdle: s.cfg.Server.MaxConnectionIdle * time.Minute,
+		Timeout:           s.cfg.Server.Timeout * time.Second,
+		MaxConnectionAge:  s.cfg.Server.MaxConnectionAge * time.Minute,
+		Time:              s.cfg.Server.Timeout * time.Minute,
 	}),
 		grpc.UnaryInterceptor(im.Logger),
 		grpc.ChainUnaryInterceptor(grpcrecovery.UnaryServerInterceptor()),
