@@ -13,6 +13,7 @@ import (
 	userService "github.com/AleksK1NG/auth-microservice/proto"
 	"github.com/go-redis/redis/v8"
 	grpcrecovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
+	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/jmoiron/sqlx"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -73,8 +74,9 @@ func (s *Server) Run() error {
 	}),
 		grpc.UnaryInterceptor(im.Logger),
 		grpc.ChainUnaryInterceptor(
-			grpcrecovery.UnaryServerInterceptor(),
+			grpc_ctxtags.UnaryServerInterceptor(),
 			grpc_prometheus.UnaryServerInterceptor,
+			grpcrecovery.UnaryServerInterceptor(),
 		),
 	)
 
