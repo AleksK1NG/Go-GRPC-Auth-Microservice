@@ -21,6 +21,9 @@ import (
 	"google.golang.org/grpc/reflection"
 	"net"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 )
 
@@ -85,9 +88,21 @@ func (s *Server) Run() error {
 	grpc_prometheus.Register(server)
 	http.Handle("/metrics", promhttp.Handler())
 
-	s.logger.Infof("Server is listening on port: %v", s.cfg.Server.Port)
-	if err := server.Serve(l); err != nil {
-		return err
+	go func() {
+		s.logger.Infof("Server is listening on port: %v", s.cfg.Server.Port)
+		if err := server.Serve(l); err != nil {
+			s.logger.Fatal(err)
+		}
+	}()
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
+
+	select {
+	case <-quit:
+		server.GracefulStop()
+		s.logger.Info("Server Exited Properly")
 	}
+
 	return nil
 }
