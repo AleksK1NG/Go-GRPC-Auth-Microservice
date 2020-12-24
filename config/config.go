@@ -151,3 +151,17 @@ func ParseConfig(v *viper.Viper) (*Config, error) {
 
 	return &c, nil
 }
+
+// Get config
+func GetConfig(configPath string) (*Config, error) {
+	cfgFile, err := LoadConfig(configPath)
+	if err != nil {
+		return nil, err
+	}
+
+	cfg, err := ParseConfig(cfgFile)
+	if err != nil {
+		return nil, err
+	}
+	return cfg, nil
+}
