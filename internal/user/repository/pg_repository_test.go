@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"github.com/AleksK1NG/auth-microservice/internal/models"
-	"github.com/AleksK1NG/auth-microservice/internal/user"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
@@ -11,18 +10,6 @@ import (
 	"testing"
 	"time"
 )
-
-func SetupRepository() (user.UserPGRepository, sqlmock.Sqlmock, error) {
-	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
-	defer db.Close()
-
-	sqlxDB := sqlx.NewDb(db, "sqlmock")
-	defer sqlxDB.Close()
-
-	userPGRepository := NewUserPGRepository(sqlxDB)
-
-	return userPGRepository, mock, err
-}
 
 func TestUserRepository_Create(t *testing.T) {
 	t.Parallel()
@@ -44,7 +31,7 @@ func TestUserRepository_Create(t *testing.T) {
 		FirstName: "FirstName",
 		LastName:  "LastName",
 		Role:      "admin",
-		Avatar:    "",
+		Avatar:    nil,
 		Password:  "123456",
 	}
 
@@ -94,7 +81,7 @@ func TestUserRepository_FindByEmail(t *testing.T) {
 		FirstName: "FirstName",
 		LastName:  "LastName",
 		Role:      "admin",
-		Avatar:    "",
+		Avatar:    nil,
 		Password:  "123456",
 	}
 
@@ -138,7 +125,7 @@ func TestUserRepository_FindById(t *testing.T) {
 		FirstName: "FirstName",
 		LastName:  "LastName",
 		Role:      "admin",
-		Avatar:    "",
+		Avatar:    nil,
 		Password:  "123456",
 	}
 
