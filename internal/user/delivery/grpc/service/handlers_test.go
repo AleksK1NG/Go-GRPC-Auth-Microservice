@@ -19,12 +19,9 @@ func TestUsersService_Register(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-
 	userUC := mock.NewMockUserUseCase(ctrl)
 	sessUC := mockSessUC.NewMockSessionUseCase(ctrl)
-
 	apiLogger := logger.NewApiLogger(nil)
-
 	authServerGRPC := NewAuthServerGRPC(apiLogger, nil, userUC, sessUC)
 
 	reqValue := &userService.RegisterRequest{
@@ -39,7 +36,6 @@ func TestUsersService_Register(t *testing.T) {
 	t.Run("Register", func(t *testing.T) {
 		t.Parallel()
 		userID := uuid.New()
-
 		user := &models.User{
 			UserID:    userID,
 			Email:     reqValue.Email,
@@ -64,16 +60,12 @@ func TestUsersService_Login(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-
 	userUC := mock.NewMockUserUseCase(ctrl)
 	sessUC := mockSessUC.NewMockSessionUseCase(ctrl)
-
 	apiLogger := logger.NewApiLogger(nil)
-
 	cfg := &config.Config{Session: config.Session{
 		Expire: 10,
 	}}
-
 	authServerGRPC := NewAuthServerGRPC(apiLogger, cfg, userUC, sessUC)
 
 	reqValue := &userService.LoginRequest{
@@ -112,16 +104,12 @@ func TestUsersService_FindByEmail(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-
 	userUC := mock.NewMockUserUseCase(ctrl)
 	sessUC := mockSessUC.NewMockSessionUseCase(ctrl)
-
 	apiLogger := logger.NewApiLogger(nil)
-
 	cfg := &config.Config{Session: config.Session{
 		Expire: 10,
 	}}
-
 	authServerGRPC := NewAuthServerGRPC(apiLogger, cfg, userUC, sessUC)
 
 	reqValue := &userService.FindByEmailRequest{
