@@ -158,12 +158,13 @@ func (u *usersService) Logout(ctx context.Context, request *userService.LogoutRe
 }
 
 func (u *usersService) registerReqToUserModel(r *userService.RegisterRequest) (*models.User, error) {
+	avatar := r.GetAvatar()
 	candidate := &models.User{
 		Email:     r.GetEmail(),
 		FirstName: r.GetFirstName(),
 		LastName:  r.GetLastName(),
 		Role:      r.GetRole(),
-		Avatar:    r.GetAvatar(),
+		Avatar:    &avatar,
 		Password:  r.GetPassword(),
 	}
 
@@ -182,7 +183,7 @@ func (u *usersService) userModelToProto(user *models.User) *userService.User {
 		Password:  user.Password,
 		Email:     user.Email,
 		Role:      user.Role,
-		Avatar:    user.Avatar,
+		Avatar:    user.GetAvatar(),
 		CreatedAt: timestamppb.New(user.CreatedAt),
 		UpdatedAt: timestamppb.New(user.UpdatedAt),
 	}
