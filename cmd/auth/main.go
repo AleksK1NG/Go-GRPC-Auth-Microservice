@@ -17,14 +17,9 @@ func main() {
 	log.Println("Starting user microservice")
 
 	configPath := utils.GetConfigPath(os.Getenv("config"))
-	cfgFile, err := config.LoadConfig(configPath)
+	cfg, err := config.GetConfig(configPath)
 	if err != nil {
-		log.Fatalf("LoadConfig: %v", err)
-	}
-
-	cfg, err := config.ParseConfig(cfgFile)
-	if err != nil {
-		log.Fatalf("ParseConfig: %v", err)
+		log.Fatalf("Loading config: %v", err)
 	}
 
 	appLogger := logger.NewApiLogger(cfg)
