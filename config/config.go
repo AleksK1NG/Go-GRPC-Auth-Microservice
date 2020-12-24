@@ -12,9 +12,7 @@ type Config struct {
 	Server   ServerConfig
 	Postgres PostgresConfig
 	Redis    RedisConfig
-	MongoDB  MongoDB
 	Cookie   Cookie
-	Store    Store
 	Session  Session
 	Metrics  Metrics
 	Logger   Logger
@@ -75,11 +73,6 @@ type RedisConfig struct {
 	DB             int
 }
 
-// MongoDB config
-type MongoDB struct {
-	MongoURI string
-}
-
 // Cookie config
 type Cookie struct {
 	Name     string
@@ -101,11 +94,6 @@ type Metrics struct {
 	ServiceName string
 }
 
-// Store config
-type Store struct {
-	ImagesFolder string
-}
-
 // AWS S3
 type AWS struct {
 	Endpoint       string
@@ -115,7 +103,7 @@ type AWS struct {
 	MinioEndpoint  string
 }
 
-// AWS S3
+// Jaeger
 type Jaeger struct {
 	Host        string
 	ServiceName string
