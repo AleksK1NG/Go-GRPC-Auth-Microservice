@@ -58,13 +58,6 @@ metrics:
   Url: 0.0.0.0:7070
   ServiceName: auth_microservice
 
-aws:
-  Endpoint: 127.0.0.1:9000
-  MinioAccessKey: minio
-  MinioSecretKey: minio123
-  UseSSL: false
-  MinioEndpoint: http://127.0.0.1:9000
-
 jaeger:
   Host: localhost:6831
   ServiceName: Auth_GRPC
