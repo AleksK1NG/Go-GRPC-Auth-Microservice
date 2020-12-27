@@ -24,7 +24,13 @@ func main() {
 
 	appLogger := logger.NewApiLogger(cfg)
 	appLogger.InitLogger()
-	appLogger.Infof("AppVersion: %s, LogLevel: %s, Mode: %s, SSL: %v", cfg.Server.AppVersion, cfg.Logger.Level, cfg.Server.Mode, cfg.Server.SSL)
+	appLogger.Infof(
+		"AppVersion: %s, LogLevel: %s, Mode: %s, SSL: %v",
+		cfg.Server.AppVersion,
+		cfg.Logger.Level,
+		cfg.Server.Mode,
+		cfg.Server.SSL,
+	)
 	appLogger.Infof("Success parsed config: %#v", cfg.Server.AppVersion)
 
 	psqlDB, err := postgres.NewPsqlDB(cfg)
