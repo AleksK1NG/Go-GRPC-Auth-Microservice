@@ -16,7 +16,6 @@ type Config struct {
 	Session  Session
 	Metrics  Metrics
 	Logger   Logger
-	AWS      AWS
 	Jaeger   Jaeger
 }
 
@@ -92,15 +91,6 @@ type Session struct {
 type Metrics struct {
 	URL         string
 	ServiceName string
-}
-
-// AWS S3
-type AWS struct {
-	Endpoint       string
-	MinioAccessKey string
-	MinioSecretKey string
-	UseSSL         bool
-	MinioEndpoint  string
 }
 
 // Jaeger
