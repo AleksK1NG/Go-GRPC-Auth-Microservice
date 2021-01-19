@@ -4,12 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
+
+	"github.com/go-redis/redis/v8"
+	"github.com/opentracing/opentracing-go"
+
 	"github.com/AleksK1NG/auth-microservice/internal/models"
 	"github.com/AleksK1NG/auth-microservice/pkg/grpc_errors"
 	"github.com/AleksK1NG/auth-microservice/pkg/logger"
-	"github.com/go-redis/redis/v8"
-	"github.com/opentracing/opentracing-go"
-	"time"
 )
 
 // Auth redis repository

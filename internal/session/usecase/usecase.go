@@ -2,10 +2,12 @@ package usecase
 
 import (
 	"context"
+
+	"github.com/opentracing/opentracing-go"
+
 	"github.com/AleksK1NG/auth-microservice/config"
 	"github.com/AleksK1NG/auth-microservice/internal/models"
 	"github.com/AleksK1NG/auth-microservice/internal/session"
-	"github.com/opentracing/opentracing-go"
 )
 
 // Session use case

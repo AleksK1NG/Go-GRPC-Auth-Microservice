@@ -2,14 +2,16 @@ package interceptors
 
 import (
 	"context"
+	"net/http"
+	"time"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
+
 	"github.com/AleksK1NG/auth-microservice/config"
 	"github.com/AleksK1NG/auth-microservice/pkg/grpc_errors"
 	"github.com/AleksK1NG/auth-microservice/pkg/logger"
 	"github.com/AleksK1NG/auth-microservice/pkg/metric"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/metadata"
-	"net/http"
-	"time"
 )
 
 // InterceptorManager

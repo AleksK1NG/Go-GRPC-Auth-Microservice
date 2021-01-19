@@ -2,13 +2,15 @@ package repository
 
 import (
 	"context"
-	"github.com/AleksK1NG/auth-microservice/internal/models"
+	"testing"
+	"time"
+
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/require"
-	"testing"
-	"time"
+
+	"github.com/AleksK1NG/auth-microservice/internal/models"
 )
 
 func TestUserRepository_Create(t *testing.T) {

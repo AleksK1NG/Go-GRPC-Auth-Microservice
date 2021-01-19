@@ -2,16 +2,18 @@ package service
 
 import (
 	"context"
+	"testing"
+
+	"github.com/golang/mock/gomock"
+	"github.com/google/uuid"
+	"github.com/stretchr/testify/require"
+
 	"github.com/AleksK1NG/auth-microservice/config"
 	"github.com/AleksK1NG/auth-microservice/internal/models"
 	mockSessUC "github.com/AleksK1NG/auth-microservice/internal/session/mock"
 	"github.com/AleksK1NG/auth-microservice/internal/user/mock"
 	"github.com/AleksK1NG/auth-microservice/pkg/logger"
 	userService "github.com/AleksK1NG/auth-microservice/proto"
-	"github.com/golang/mock/gomock"
-	"github.com/google/uuid"
-	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestUsersService_Register(t *testing.T) {
@@ -21,7 +23,7 @@ func TestUsersService_Register(t *testing.T) {
 	defer ctrl.Finish()
 	userUC := mock.NewMockUserUseCase(ctrl)
 	sessUC := mockSessUC.NewMockSessionUseCase(ctrl)
-	apiLogger := logger.NewApiLogger(nil)
+	apiLogger := logger.NewAPILogger(nil)
 	authServerGRPC := NewAuthServerGRPC(apiLogger, nil, userUC, sessUC)
 
 	reqValue := &userService.RegisterRequest{
@@ -62,7 +64,7 @@ func TestUsersService_Login(t *testing.T) {
 	defer ctrl.Finish()
 	userUC := mock.NewMockUserUseCase(ctrl)
 	sessUC := mockSessUC.NewMockSessionUseCase(ctrl)
-	apiLogger := logger.NewApiLogger(nil)
+	apiLogger := logger.NewAPILogger(nil)
 	cfg := &config.Config{Session: config.Session{
 		Expire: 10,
 	}}
@@ -106,7 +108,7 @@ func TestUsersService_FindByEmail(t *testing.T) {
 	defer ctrl.Finish()
 	userUC := mock.NewMockUserUseCase(ctrl)
 	sessUC := mockSessUC.NewMockSessionUseCase(ctrl)
-	apiLogger := logger.NewApiLogger(nil)
+	apiLogger := logger.NewAPILogger(nil)
 	cfg := &config.Config{Session: config.Session{
 		Expire: 10,
 	}}

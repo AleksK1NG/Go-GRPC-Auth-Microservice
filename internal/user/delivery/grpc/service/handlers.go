@@ -2,10 +2,7 @@ package service
 
 import (
 	"context"
-	"github.com/AleksK1NG/auth-microservice/internal/models"
-	"github.com/AleksK1NG/auth-microservice/pkg/grpc_errors"
-	"github.com/AleksK1NG/auth-microservice/pkg/utils"
-	userService "github.com/AleksK1NG/auth-microservice/proto"
+
 	"github.com/go-redis/redis/v8"
 	"github.com/google/uuid"
 	"github.com/opentracing/opentracing-go"
@@ -14,6 +11,11 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
+
+	"github.com/AleksK1NG/auth-microservice/internal/models"
+	"github.com/AleksK1NG/auth-microservice/pkg/grpc_errors"
+	"github.com/AleksK1NG/auth-microservice/pkg/utils"
+	userService "github.com/AleksK1NG/auth-microservice/proto"
 )
 
 // Register new user

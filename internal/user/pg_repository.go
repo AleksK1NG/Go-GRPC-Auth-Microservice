@@ -3,8 +3,10 @@ package user
 
 import (
 	"context"
-	"github.com/AleksK1NG/auth-microservice/internal/models"
+
 	"github.com/google/uuid"
+
+	"github.com/AleksK1NG/auth-microservice/internal/models"
 )
 
 // User pg repository

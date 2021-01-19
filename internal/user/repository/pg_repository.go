@@ -2,11 +2,13 @@ package repository
 
 import (
 	"context"
-	"github.com/AleksK1NG/auth-microservice/internal/models"
+
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
+
+	"github.com/AleksK1NG/auth-microservice/internal/models"
 )
 
 // User repository

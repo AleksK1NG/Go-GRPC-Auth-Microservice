@@ -1,6 +1,11 @@
 package main
 
 import (
+	"log"
+	"os"
+
+	"github.com/opentracing/opentracing-go"
+
 	"github.com/AleksK1NG/auth-microservice/config"
 	"github.com/AleksK1NG/auth-microservice/internal/server"
 	jaegerTracer "github.com/AleksK1NG/auth-microservice/pkg/jaeger"
@@ -8,13 +13,10 @@ import (
 	"github.com/AleksK1NG/auth-microservice/pkg/postgres"
 	"github.com/AleksK1NG/auth-microservice/pkg/redis"
 	"github.com/AleksK1NG/auth-microservice/pkg/utils"
-	"github.com/opentracing/opentracing-go"
-	"log"
-	"os"
 )
 
 func main() {
-	log.Println("Starting user microservice")
+	log.Println("Starting auth microservice")
 
 	configPath := utils.GetConfigPath(os.Getenv("config"))
 	cfg, err := config.GetConfig(configPath)
@@ -22,7 +24,7 @@ func main() {
 		log.Fatalf("Loading config: %v", err)
 	}
 
-	appLogger := logger.NewApiLogger(cfg)
+	appLogger := logger.NewAPILogger(cfg)
 	appLogger.InitLogger()
 	appLogger.Infof(
 		"AppVersion: %s, LogLevel: %s, Mode: %s, SSL: %v",

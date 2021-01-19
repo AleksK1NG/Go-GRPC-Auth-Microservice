@@ -3,6 +3,7 @@ package user
 
 import (
 	"context"
+
 	"github.com/AleksK1NG/auth-microservice/internal/models"
 )
 

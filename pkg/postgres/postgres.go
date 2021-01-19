@@ -2,8 +2,9 @@ package postgres
 
 import (
 	"fmt"
-	"github.com/AleksK1NG/auth-microservice/config"
 	"time"
+
+	"github.com/AleksK1NG/auth-microservice/config"
 
 	_ "github.com/jackc/pgx/stdlib" // pgx driver
 	"github.com/jmoiron/sqlx"

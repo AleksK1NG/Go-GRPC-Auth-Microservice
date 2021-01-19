@@ -1,10 +1,12 @@
 package logger
 
 import (
-	"github.com/AleksK1NG/auth-microservice/config"
+	"os"
+
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"os"
+
+	"github.com/AleksK1NG/auth-microservice/config"
 )
 
 // Logger methods interface
@@ -31,7 +33,7 @@ type apiLogger struct {
 }
 
 // App Logger constructor
-func NewApiLogger(cfg *config.Config) *apiLogger {
+func NewAPILogger(cfg *config.Config) *apiLogger {
 	return &apiLogger{cfg: cfg}
 }
 
@@ -59,8 +61,7 @@ func (l *apiLogger) getLoggerLevel(cfg *config.Config) zapcore.Level {
 func (l *apiLogger) InitLogger() {
 	logLevel := l.getLoggerLevel(l.cfg)
 
-	var logWriter zapcore.WriteSyncer
-	logWriter = zapcore.AddSync(os.Stderr)
+	logWriter := zapcore.AddSync(os.Stderr)
 
 	var encoderCfg zapcore.EncoderConfig
 	if l.cfg.Server.Mode == "Development" {

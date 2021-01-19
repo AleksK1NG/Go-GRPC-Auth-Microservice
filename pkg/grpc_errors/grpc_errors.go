@@ -3,11 +3,12 @@ package grpc_errors
 import (
 	"context"
 	"database/sql"
+	"net/http"
+	"strings"
+
 	"github.com/go-redis/redis/v8"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc/codes"
-	"net/http"
-	"strings"
 )
 
 var (
@@ -38,10 +39,6 @@ func ParseGRPCErrStatusCode(err error) codes.Code {
 		return codes.InvalidArgument
 	case strings.Contains(err.Error(), "redis"):
 		return codes.NotFound
-	case errors.Is(err, context.Canceled):
-		return codes.Canceled
-	case errors.Is(err, context.DeadlineExceeded):
-		return codes.DeadlineExceeded
 	}
 	return codes.Internal
 }

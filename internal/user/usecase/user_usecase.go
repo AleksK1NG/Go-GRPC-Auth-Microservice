@@ -2,14 +2,16 @@ package usecase
 
 import (
 	"context"
-	"github.com/AleksK1NG/auth-microservice/internal/models"
-	"github.com/AleksK1NG/auth-microservice/internal/user"
-	"github.com/AleksK1NG/auth-microservice/pkg/grpc_errors"
-	"github.com/AleksK1NG/auth-microservice/pkg/logger"
+
 	"github.com/go-redis/redis/v8"
 	"github.com/google/uuid"
 	"github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
+
+	"github.com/AleksK1NG/auth-microservice/internal/models"
+	"github.com/AleksK1NG/auth-microservice/internal/user"
+	"github.com/AleksK1NG/auth-microservice/pkg/grpc_errors"
+	"github.com/AleksK1NG/auth-microservice/pkg/logger"
 )
 
 const (

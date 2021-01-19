@@ -3,14 +3,16 @@ package usecase
 import (
 	"context"
 	"database/sql"
-	"github.com/AleksK1NG/auth-microservice/internal/models"
-	"github.com/AleksK1NG/auth-microservice/internal/user/mock"
-	"github.com/AleksK1NG/auth-microservice/pkg/logger"
+	"testing"
+
 	"github.com/go-redis/redis/v8"
 	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
-	"testing"
+
+	"github.com/AleksK1NG/auth-microservice/internal/models"
+	"github.com/AleksK1NG/auth-microservice/internal/user/mock"
+	"github.com/AleksK1NG/auth-microservice/pkg/logger"
 )
 
 func TestUserUseCase_Register(t *testing.T) {
@@ -21,7 +23,7 @@ func TestUserUseCase_Register(t *testing.T) {
 
 	userPGRepository := mock.NewMockUserPGRepository(ctrl)
 	userRedisRepository := mock.NewMockUserRedisRepository(ctrl)
-	apiLogger := logger.NewApiLogger(nil)
+	apiLogger := logger.NewAPILogger(nil)
 	userUC := NewUserUseCase(apiLogger, userPGRepository, userRedisRepository)
 
 	userID := uuid.New()
@@ -62,7 +64,7 @@ func TestUserUseCase_FindByEmail(t *testing.T) {
 
 	userPGRepository := mock.NewMockUserPGRepository(ctrl)
 	userRedisRepository := mock.NewMockUserRedisRepository(ctrl)
-	apiLogger := logger.NewApiLogger(nil)
+	apiLogger := logger.NewAPILogger(nil)
 	userUC := NewUserUseCase(apiLogger, userPGRepository, userRedisRepository)
 
 	userID := uuid.New()
@@ -94,7 +96,7 @@ func TestUserUseCase_FindById(t *testing.T) {
 
 	userPGRepository := mock.NewMockUserPGRepository(ctrl)
 	userRedisRepository := mock.NewMockUserRedisRepository(ctrl)
-	apiLogger := logger.NewApiLogger(nil)
+	apiLogger := logger.NewAPILogger(nil)
 	userUC := NewUserUseCase(apiLogger, userPGRepository, userRedisRepository)
 
 	userID := uuid.New()
