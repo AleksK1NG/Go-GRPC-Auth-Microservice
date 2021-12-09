@@ -90,7 +90,6 @@ func (s *Server) Run() error {
 	userService.RegisterUserServiceServer(server, authGRPCServer)
 
 	grpc_prometheus.Register(server)
-	http.Handle("/metrics", promhttp.Handler())
 
 	go func() {
 		s.logger.Infof("Server is listening on port: %v", s.cfg.Server.Port)
